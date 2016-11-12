@@ -3,6 +3,9 @@
 ----------------------------------
 class Box
   new: (@x, @y, @w, @h) =>
+    @rect = light_world\newRectangle @x, @y, @w, @h
+
+  update: (dt) =>
 
   move: (dx, dy) =>
     world\move @, @x + dx, @y + dy
@@ -12,4 +15,4 @@ class Box
 
   draw: =>
     love.graphics.setColor 0, 0, 0
-    love.graphics.rectangle "fill", @x, @y, @w, @h
+    love.graphics.polygon "fill", @rect\getPoints!

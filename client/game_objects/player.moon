@@ -1,28 +1,48 @@
-class Player extends Box
-  new: (x, y, w, h) =>
-    super x, y, w, h
-
+class Player
+  new: (@x, @y, @w, @h) =>
     @dx, @dy      = 0, 0
-    @friction     = 0.25
-    @acceleration = 10
+    @friction     = 0.15
+    @acceleration = 25
+    @gravity      = 50
+    @jump_height  = 12
 
     @set_controls "a", "d", "space"
 
+    @rect = light_world\newRectangle @x, @y, @w, @h
+
   set_controls: (@left, @right, @jump) =>
 
-  update: (dt) ->
+  draw: =>
+    love.graphics.setColor 0, 0, 0
+    love.graphics.polygon "fill", @rect\getPoints!
+
+  update: (dt) =>
     if love.keyboard.isDown @left
-      @dx += @acceleration * dt
-    if love.keyboard.isDown @right
       @dx -= @acceleration * dt
+    if love.keyboard.isDown @right
+      @dx += @acceleration * dt
+
+    @dy += @gravity * dt
 
     @dx -= (@dx / @friction) * dt
     @dy -= (@dy / @friction) * dt
 
     @x, @y, @cols = world\move @, @x + @dx, @y + @dy
+    @rect.x, @rect.y = @x, @y
 
+    camera.x = math.lerp camera.x, @x, dt
+
+    @grounded = false
     for v in *@cols
-      if v.normal.y == -1
-        @grounded = true
+      if v.normal.y ~= 0
+        if v.normal.y == -1
+          @grounded = true
+        @dy = 0
+
       if v.normal.x ~= 0
         @dx = 0
+
+  press: (key) =>
+    if key == "space"
+      if @grounded
+        @dy = -@jump_height
