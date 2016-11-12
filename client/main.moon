@@ -54,7 +54,7 @@ love.load = ->
   ----------------------------------
   export game_objects = {}
 
-  camera\setScale 1.5, 1.5
+  camera\setScale 2, 2
 
   ----------------------------------
   -- Load level

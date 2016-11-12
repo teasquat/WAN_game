@@ -31,6 +31,7 @@ class Player
     @rect.x, @rect.y = @x, @y
 
     camera.x = math.lerp camera.x, @x, dt
+    camera.y = math.lerp camera.y, @y, dt / 8
 
     @grounded = false
     for v in *@cols
