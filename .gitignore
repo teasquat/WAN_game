@@ -1,0 +1,2 @@
+**/*.lua
+!love/lib/**.lua
