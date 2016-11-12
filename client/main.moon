@@ -7,13 +7,21 @@ love.graphics.setDefaultFilter "nearest", "nearest"
 ----------------------------------
 -- Game objects
 ----------------------------------
-import Box from require "game_objects"
-
 export make_box = (x, y, w, h) ->
+  import Box from require "game_objects"
+
   box = Box x, y, w, h
 
   world.add box, x, y, w, h
   table.insert game_objects, box
+
+export make_player = (x, y, w, h) ->
+  import Player from require "game_objects"
+
+  player = Player x, y, w, h
+
+  world.add player, x, y, w, h
+  table.insert game_objects, player
 
 love.load = ->
   export camera       = gamera.new 0, 0, love.graphics.getWidth!, love.graphics.getHeight!
