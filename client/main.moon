@@ -28,6 +28,9 @@ export make_box = (x, y, w, h) ->
   world\add box, x, y, w, h
   table.insert game_objects, box
 
+export make_pane = (x, y, w, h) ->
+  table.insert game_objects, Box x, y, w, h
+
 export make_player = (x, y, w, h) ->
   import Player from require "game_objects"
 
@@ -46,9 +49,6 @@ love.load = ->
     shadowBlur: 2.0
   }
 
-  export light_mouse = light_world\newLight 0, 0, 255, 255, 255, 4000
-  light_mouse.z = 0.1
-
   ----------------------------------
   -- List of game-objects to be updated and drawn
   ----------------------------------
@@ -66,8 +66,6 @@ love.load = ->
 
 love.update = (dt) ->
   love.window.setTitle "_business(#{ love.timer.getFPS! })"
-
-  light_mouse\setPosition camera.x, camera.y - love.graphics.getHeight! / 3
 
   for v in *game_objects
     v\update dt if v.update
@@ -98,5 +96,10 @@ export load_map = (image_data) ->
 
       if r + g + b == 0
         make_box x * 16, y * 16, 16, 16
-      if r == 255 and g == 0 and b == 0
+      elseif r + g + b == 815
+        make_pane x * 16, y * 16, 16, 16
+      elseif r == 255 and g == 0 and b == 0
         make_player x * 16, y * 16, 16, 16
+      elseif r == 255 and g == 255 and b == 0
+        a = light_world\newLight x * 16, y * 16, 255, 255, 255, 1000
+        a\setSmooth -1
