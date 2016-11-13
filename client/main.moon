@@ -10,7 +10,7 @@ love.graphics.setDefaultFilter "nearest", "nearest"
 socket        = require "socket"
 address, port = "localhost", 7788
 
-update_rate   = 0.05
+update_rate   = 0.1
 update_time   = update_rate
 
 udp           = socket.udp!
@@ -83,10 +83,7 @@ export make_friend = (x, y, w, h, id=(math.random 1e5), dx, dy) ->
   player.dy = dy if dy
 
   --world\add player, x, y, w, h
-  table.insert game_players, player
-
-  unless udp_player_ref
-    udp_player_ref = player
+  table.insert game_friends, player
 ----------------------------------
 -- Initialize things and stuff
 ----------------------------------
@@ -107,6 +104,7 @@ love.load = ->
   ----------------------------------
   export game_objects = {}
   export game_players = {}
+  export game_friends = {}
 
   camera\setScale 2, 2
 
@@ -154,7 +152,7 @@ love.update = (dt) ->
           x, y, dx, dy = (tonumber x), (tonumber y), (tonumber dx), tonumber dy
 
           found = nil
-          for v in *game_players
+          for v in *game_friends
             if (tonumber v.id) == tonumber id
               found = v
               break
@@ -164,6 +162,9 @@ love.update = (dt) ->
             found.y  = y
             found.dx = dx
             found.dy = dy
+
+            found.last_dx = dx
+            found.last_dy = dy
           else
             make_friend x, y, 14, 10, (tonumber id), dx, dy
 
@@ -171,6 +172,13 @@ love.update = (dt) ->
         error "Networking error: " .. tostring m
       else
         break
+  else
+    for v in *game_friends
+      v.dx = v.last_dx if v.last_dx
+      v.dy = v.last_dy if v.last_dy
+
+  for p in *game_friends
+    p\update dt if p.update
 
   light_world\update dt
   light_world\setTranslation camera.x, camera.y, camera.scale
@@ -181,6 +189,9 @@ love.draw = ->
       love.graphics.setColor 255, 255, 255
       love.graphics.rectangle "fill", -camera.x / camera.scale, -camera.y / camera.scale, love.graphics.getWidth! / camera.scale, love.graphics.getHeight! / camera.scale
 
+      for v in *game_friends
+        v\draw! if v.draw
+
       for v in *game_players
         v\draw! if v.draw
 
@@ -188,6 +199,7 @@ love.draw = ->
         v\draw! if v.draw
 
 love.keypressed = (key) ->
+
   for v in *game_players
     v\press key if v.press
 

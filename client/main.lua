@@ -4,7 +4,7 @@ local bump = require("lib/bump")
 love.graphics.setDefaultFilter("nearest", "nearest")
 local socket = require("socket")
 local address, port = "localhost", 7788
-local update_rate = 0.05
+local update_rate = 0.1
 local update_time = update_rate
 local udp = socket.udp()
 udp:settimeout(0)
@@ -73,10 +73,7 @@ make_friend = function(x, y, w, h, id, dx, dy)
   if dy then
     player.dy = dy
   end
-  table.insert(game_players, player)
-  if not (udp_player_ref) then
-    udp_player_ref = player
-  end
+  return table.insert(game_friends, player)
 end
 math.randomseed(os.time())
 love.load = function()
@@ -94,6 +91,7 @@ love.load = function()
   })
   game_objects = { }
   game_players = { }
+  game_friends = { }
   camera:setScale(2, 2)
   local level = love.graphics.newImage("assets/levels/0.png")
   load_map(level:getData())
@@ -133,7 +131,7 @@ love.update = function(dt)
           assert(x and y and dx and dy, "This is not very good!")
           x, y, dx, dy = (tonumber(x)), (tonumber(y)), (tonumber(dx)), tonumber(dy)
           local found = nil
-          local _list_2 = game_players
+          local _list_2 = game_friends
           for _index_0 = 1, #_list_2 do
             v = _list_2[_index_0]
             if (tonumber(v.id)) == tonumber(id) then
@@ -146,6 +144,8 @@ love.update = function(dt)
             found.y = y
             found.dx = dx
             found.dy = dy
+            found.last_dx = dx
+            found.last_dy = dy
           else
             make_friend(x, y, 14, 10, (tonumber(id)), dx, dy)
           end
@@ -158,6 +158,24 @@ love.update = function(dt)
         end
       end
     end
+  else
+    local _list_2 = game_friends
+    for _index_0 = 1, #_list_2 do
+      local v = _list_2[_index_0]
+      if v.last_dx then
+        v.dx = v.last_dx
+      end
+      if v.last_dy then
+        v.dy = v.last_dy
+      end
+    end
+  end
+  local _list_2 = game_friends
+  for _index_0 = 1, #_list_2 do
+    local p = _list_2[_index_0]
+    if p.update then
+      p:update(dt)
+    end
   end
   light_world:update(dt)
   return light_world:setTranslation(camera.x, camera.y, camera.scale)
@@ -167,16 +185,23 @@ love.draw = function()
     return light_world:draw(function()
       love.graphics.setColor(255, 255, 255)
       love.graphics.rectangle("fill", -camera.x / camera.scale, -camera.y / camera.scale, love.graphics.getWidth() / camera.scale, love.graphics.getHeight() / camera.scale)
-      local _list_0 = game_players
+      local _list_0 = game_friends
       for _index_0 = 1, #_list_0 do
         local v = _list_0[_index_0]
         if v.draw then
           v:draw()
         end
       end
-      local _list_1 = game_objects
+      local _list_1 = game_players
       for _index_0 = 1, #_list_1 do
         local v = _list_1[_index_0]
+        if v.draw then
+          v:draw()
+        end
+      end
+      local _list_2 = game_objects
+      for _index_0 = 1, #_list_2 do
+        local v = _list_2[_index_0]
         if v.draw then
           v:draw()
         end

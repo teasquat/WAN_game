@@ -1,6 +1,6 @@
 socket = require "socket"
 
-address, port = "localhost", 7788
+address, port = "52.59.243.52", 7788
 
 updaterate = 0.1
 world = {}

@@ -1,4 +1,4 @@
-class Player
+class Friend
   new: (@x, @y, @w, @h) =>
     @dx, @dy      = 0, 0
     @friction     = 0.1
@@ -26,6 +26,7 @@ class Player
     table.insert @weapons, Gun x, y, a
 
   draw: =>
+    print "yooo"
     love.graphics.setColor 255, 255, 255
     love.graphics.draw @image, @x, @y, 0, @direction, 1, @w / 2, @h / 2
 
