@@ -15,6 +15,6 @@ udp\setsockname ip, port
 
 player_id = 123896
 
-udp\move "move_{#player_id}_{#x}:{#y}:{#dx}:{#dy}"
+udp\send "move_{#player_id}_{#x}:{#y}:{#dx}:{#dy}"
 udp\send "update__"
 ```
