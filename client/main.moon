@@ -36,6 +36,8 @@ export make_player = (x, y, w, h) ->
 
   player = Player x, y, w, h
 
+  player\add_gun 12, 0, 100
+
   world\add player, x, y, w, h
   table.insert game_objects, player
 
