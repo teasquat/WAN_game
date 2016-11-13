@@ -768,4 +768,3 @@ bump.responses = {
 }
 
 return bump
-0
