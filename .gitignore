@@ -1,0 +1,2 @@
+**/*.lua
+!client/lib/**.lua
