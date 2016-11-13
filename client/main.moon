@@ -106,7 +106,7 @@ export load_map = (image_data) ->
       elseif r + g + b == 815
         make_pane x * 16, y * 16, 16, 16
       elseif r == 255 and g == 0 and b == 0
-        make_player x * 16, y * 16, 16, 16
+        make_player x * 16, y * 16, 10, 14.65
       elseif r == 255 and g == 255 and b == 0
         a = light_world\newLight x * 16, y * 16, 255, 255, 255, 450
         a\setSmooth -1

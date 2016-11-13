@@ -9,6 +9,12 @@ class Player
 
     @set_controls "a", "d", "space"
 
+    @image   = love.graphics.newImage "assets/sheets/player/naked.png"
+    @image_n = love.graphics.newImage "assets/sheets/player/naked_m.png"
+
+    @sprite  = light_world\newImage @image, @x, @y
+    @sprite\setNormalMap @image_n
+
     @rect = light_world\newRectangle @x, @y, @w, @h
 
     @weapons = {}
@@ -27,8 +33,8 @@ class Player
   set_controls: (@left, @right, @jump) =>
 
   draw: =>
-    love.graphics.setColor 0, 0, 0
-    love.graphics.polygon "fill", @rect\getPoints!
+    love.graphics.setColor 255, 255, 255
+    love.graphics.draw @image, @x, @y, 0, @direction, 1, @w / 2, @h / 2
 
     for w in *@weapons
       w\draw!
@@ -45,7 +51,8 @@ class Player
     @dy -= (@dy / @friction_v) * dt
 
     @x, @y, @cols = world\move @, @x + @dx, @y + @dy
-    @rect.x, @rect.y = @x, @y
+    @rect.x, @rect.y     = @x, @y
+    @sprite.x, @sprite.y = @x, @y
 
     camera.x, camera.y = -@x + love.graphics.getWidth! / 3, -@y + love.graphics.getHeight! / 2
 

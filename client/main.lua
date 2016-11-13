@@ -101,7 +101,7 @@ load_map = function(image_data)
       elseif r + g + b == 815 then
         make_pane(x * 16, y * 16, 16, 16)
       elseif r == 255 and g == 0 and b == 0 then
-        make_player(x * 16, y * 16, 16, 16)
+        make_player(x * 16, y * 16, 10, 14.65)
       elseif r == 255 and g == 255 and b == 0 then
         a = light_world:newLight(x * 16, y * 16, 255, 255, 255, 450)
         a:setSmooth(-1)
