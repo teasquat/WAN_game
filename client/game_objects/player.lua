@@ -11,8 +11,8 @@ do
       self.left, self.right, self.jump = left, right, jump
     end,
     draw = function(self)
-      love.graphics.setColor(0, 0, 0)
-      love.graphics.polygon("fill", self.rect:getPoints())
+      love.graphics.setColor(255, 255, 255)
+      love.graphics.draw(self.image, self.x, self.y, 0, self.direction, 1, self.w / 2, self.h / 2)
       local _list_0 = self.weapons
       for _index_0 = 1, #_list_0 do
         local w = _list_0[_index_0]
@@ -31,6 +31,7 @@ do
       self.dy = self.dy - ((self.dy / self.friction_v) * dt)
       self.x, self.y, self.cols = world:move(self, self.x + self.dx, self.y + self.dy)
       self.rect.x, self.rect.y = self.x, self.y
+      self.sprite.x, self.sprite.y = self.x, self.y
       camera.x, camera.y = -self.x + love.graphics.getWidth() / 3, -self.y + love.graphics.getHeight() / 2
       self.grounded = false
       local _list_0 = self.cols
@@ -81,6 +82,10 @@ do
       self.gravity = 50
       self.jump_height = 8.5
       self:set_controls("a", "d", "space")
+      self.image = love.graphics.newImage("assets/sheets/player/naked.png")
+      self.image_n = love.graphics.newImage("assets/sheets/player/naked_m.png")
+      self.sprite = light_world:newImage(self.image, self.x, self.y)
+      self.sprite:setNormalMap(self.image_n)
       self.rect = light_world:newRectangle(self.x, self.y, self.w, self.h)
       self.weapons = { }
       self.direction = -1
