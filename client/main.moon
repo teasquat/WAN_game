@@ -43,7 +43,7 @@ love.load = ->
   export camera       = gamera.new 0, 0, love.graphics.getWidth!, love.graphics.getHeight!
   export world        = bump.newWorld 64
   export light_world  = light {
-    ambient:              {0, 0, 0}
+    ambient:              {100, 100, 100}
     refractionStrength:   1000
     reflectionVisibility: 0
     shadowBlur: 2.0
@@ -101,5 +101,5 @@ export load_map = (image_data) ->
       elseif r == 255 and g == 0 and b == 0
         make_player x * 16, y * 16, 16, 16
       elseif r == 255 and g == 255 and b == 0
-        a = light_world\newLight x * 16, y * 16, 255, 255, 255, 1000
+        a = light_world\newLight x * 16, y * 16, 255, 255, 255, 450
         a\setSmooth -1
