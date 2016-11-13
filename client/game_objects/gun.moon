@@ -5,18 +5,18 @@ class Gun
   new: (@x, @y, @ammo, @w = 14, @h = 4) =>
     @rect = light_world\newRectangle @x, @y, @w, @h
 
-    @bullet_speed = 40
+    @bullet_speed = 15
     @projectiles  = {}
 
   set_image: (path) =>
     @image = love.graphics.newImage path
 
-  update: (mother, dir) =>
-    @rect.x = mother.x + @x * dir
+  update: (mother, @dir) =>
+    @rect.x = mother.x + @x * @dir
     @rect.y = mother.y + @y
 
     for b in *@projectiles
-      b.x += @bullet_speed
+      b.rect.x += @bullet_speed * b.dir
 
   draw: =>
     for b in *@projectiles
@@ -27,5 +27,5 @@ class Gun
     love.graphics.polygon "fill", @rect\getPoints!
 
   shoot: (a) =>
-    a = light_world\newRectangle @x + @w, @y + @h
-    table.insert @projectiles, {@x + @w, @y + @h}
+    rect = light_world\newRectangle @rect.x + @w, @rect.y + @h, 4, 4
+    table.insert @projectiles, {:rect, dir: @dir}

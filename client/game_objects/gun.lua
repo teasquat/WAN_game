@@ -6,12 +6,13 @@ do
       self.image = love.graphics.newImage(path)
     end,
     update = function(self, mother, dir)
-      self.rect.x = mother.x + self.x * dir
+      self.dir = dir
+      self.rect.x = mother.x + self.x * self.dir
       self.rect.y = mother.y + self.y
       local _list_0 = self.projectiles
       for _index_0 = 1, #_list_0 do
         local b = _list_0[_index_0]
-        b.x = b.x + self.bullet_speed
+        b.rect.x = b.rect.x + (self.bullet_speed * b.dir)
       end
     end,
     draw = function(self)
@@ -25,9 +26,10 @@ do
       return love.graphics.polygon("fill", self.rect:getPoints())
     end,
     shoot = function(self, a)
+      local rect = light_world:newRectangle(self.rect.x + self.w, self.rect.y + self.h, 4, 4)
       return table.insert(self.projectiles, {
-        self.x + self.w,
-        self.y + self.y
+        rect = rect,
+        dir = self.dir
       })
     end
   }
@@ -42,7 +44,7 @@ do
       end
       self.x, self.y, self.ammo, self.w, self.h = x, y, ammo, w, h
       self.rect = light_world:newRectangle(self.x, self.y, self.w, self.h)
-      self.bullet_speed = 40
+      self.bullet_speed = 15
       self.projectiles = { }
     end,
     __base = _base_0,
