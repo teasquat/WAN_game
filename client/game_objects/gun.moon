@@ -27,4 +27,5 @@ class Gun
     love.graphics.polygon "fill", @rect\getPoints!
 
   shoot: (a) =>
-    table.insert @projectiles, {@x + @w, @y + @y}
+    a = light_world\newRectangle @x + @w, @y + @h
+    table.insert @projectiles, {@x + @w, @y + @h}
