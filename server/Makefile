@@ -1,2 +1,2 @@
 moon:
-	moonc . && lua server.lua
+	moonc . && lua5.1 server.lua
