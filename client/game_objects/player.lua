@@ -31,8 +31,7 @@ do
       self.dy = self.dy - ((self.dy / self.friction_v) * dt)
       self.x, self.y, self.cols = world:move(self, self.x + self.dx, self.y + self.dy)
       self.rect.x, self.rect.y = self.x, self.y
-      camera.x = math.lerp(camera.x, self.x, dt)
-      camera.y = math.lerp(camera.y, self.y, dt / 2)
+      camera.x, camera.y = -self.x + love.graphics.getWidth() / 3, -self.y + love.graphics.getHeight() / 2
       self.grounded = false
       local _list_0 = self.cols
       for _index_0 = 1, #_list_0 do

@@ -71,8 +71,6 @@ love.load = ->
   level    = love.graphics.newImage "assets/levels/0.png"
   load_map level\getData!
 
-  export render_buffer = love.graphics.newCanvas love.graphics.getWidth!, love.graphics.getHeight!
-
 love.update = (dt) ->
   love.window.setTitle "_business(#{ love.timer.getFPS! })"
 

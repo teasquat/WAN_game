@@ -54,8 +54,7 @@ love.load = function()
   game_objects = { }
   camera:setScale(2, 2)
   local level = love.graphics.newImage("assets/levels/0.png")
-  load_map(level:getData())
-  render_buffer = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
+  return load_map(level:getData())
 end
 love.update = function(dt)
   love.window.setTitle("_business(" .. tostring(love.timer.getFPS()) .. ")")

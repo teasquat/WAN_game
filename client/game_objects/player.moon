@@ -47,8 +47,7 @@ class Player
     @x, @y, @cols = world\move @, @x + @dx, @y + @dy
     @rect.x, @rect.y = @x, @y
 
-    camera.x = math.lerp camera.x, @x, dt
-    camera.y = math.lerp camera.y, @y, dt / 2
+    camera.x, camera.y = -@x + love.graphics.getWidth! / 3, -@y + love.graphics.getHeight! / 2
 
     @grounded = false
     for v in *@cols
