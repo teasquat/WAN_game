@@ -24,9 +24,17 @@ love.update = (dt) ->
   print(dt)
   entity.x += entity.dx*dt
   entity.y += entity.dy*dt
+  entity.dx -= entity.dx*dt
+  entity.dy -= entity.dy*dt
 
   if love.keyboard.isDown "right"
-    entity.dx += dt*10
+    entity.dx += dt*100
+  if love.keyboard.isDown "left"
+    entity.dx -= dt*100
+  if love.keyboard.isDown "down"
+    entity.dy += dt*100
+  if love.keyboard.isDown "up"
+    entity.dy -= dt*100
 
   for k, v in pairs(world) do
     v.x += v.dx*dt
