@@ -1,10 +1,11 @@
 class Player
   new: (@x, @y, @w, @h) =>
     @dx, @dy      = 0, 0
-    @friction     = 0.15
-    @acceleration = 25
+    @friction     = 0.1
+    @friction_v   = 2
+    @acceleration = 30
     @gravity      = 50
-    @jump_height  = 12
+    @jump_height  = 7
 
     @set_controls "a", "d", "space"
 
@@ -25,13 +26,13 @@ class Player
     @dy += @gravity * dt
 
     @dx -= (@dx / @friction) * dt
-    @dy -= (@dy / @friction) * dt
+    @dy -= (@dy / @friction_v) * dt
 
     @x, @y, @cols = world\move @, @x + @dx, @y + @dy
     @rect.x, @rect.y = @x, @y
 
     camera.x = math.lerp camera.x, @x, dt
-    camera.y = math.lerp camera.y, @y, dt / 8
+    camera.y = math.lerp camera.y, @y, dt / 2
 
     @grounded = false
     for v in *@cols
