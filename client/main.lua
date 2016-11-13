@@ -4,7 +4,7 @@ local bump = require("lib/bump")
 love.graphics.setDefaultFilter("nearest", "nearest")
 local socket = require("socket")
 local address, port = "localhost", 7788
-local update_rate = 0.1
+local update_rate = 0.05
 local update_time = update_rate
 local udp = socket.udp()
 udp:settimeout(0)
@@ -27,10 +27,10 @@ math.sign = function(a)
   end
   return 0
 end
-make_box = function(x, y, w, h)
+make_box = function(x, y, w, h, path)
   local Box
   Box = require("game_objects").Box
-  local box = Box(x, y, w, h)
+  local box = Box(x, y, w, h, path)
   world:add(box, x, y, w, h)
   return table.insert(game_objects, box)
 end
@@ -44,7 +44,7 @@ make_player = function(x, y, w, h, id, dx, dy)
   local Player
   Player = require("game_objects").Player
   local player = Player(x, y, w, h)
-  player:add_gun(12, 0, 100)
+  player:add_gun(3, 2, 100)
   player.id = id
   if dx then
     player.dx = dx
@@ -58,15 +58,35 @@ make_player = function(x, y, w, h, id, dx, dy)
     udp_player_ref = player
   end
 end
+make_friend = function(x, y, w, h, id, dx, dy)
+  if id == nil then
+    id = (math.random(1e5))
+  end
+  local Friend
+  Friend = require("game_objects").Friend
+  local player = Friend(x, y, w, h)
+  player:add_gun(12, 0, 100)
+  player.id = id
+  if dx then
+    player.dx = dx
+  end
+  if dy then
+    player.dy = dy
+  end
+  table.insert(game_players, player)
+  if not (udp_player_ref) then
+    udp_player_ref = player
+  end
+end
 math.randomseed(os.time())
 love.load = function()
   camera = gamera.new(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
   world = bump.newWorld(64)
   light_world = light({
     ambient = {
-      100,
-      100,
-      100
+      200,
+      200,
+      200
     },
     refractionStrength = 1000,
     reflectionVisibility = 0,
@@ -81,46 +101,6 @@ love.load = function()
 end
 love.update = function(dt)
   love.window.setTitle("_business(" .. tostring(love.timer.getFPS()) .. ")")
-  update_time = update_time + dt
-  if update_time > update_rate and udp_player_ref then
-    udp:send("move_" .. tostring(udp_player_ref.id) .. "_" .. tostring(udp_player_ref.x) .. ":" .. tostring(udp_player_ref.y) .. ":" .. tostring(udp_player_ref.dx) .. ":" .. tostring(udp_player_ref.dy))
-    udp:send("update__")
-    update_time = update_time - update_rate
-    while true do
-      local data, m = udp:receive()
-      if data then
-        local id, v = data:match("^(%d*)_(.*)")
-        if not ((tonumber(id)) == tonumber(udp_player_ref.id)) then
-          local x, y, dx, dy = v:match("^(.*):(.*):(.*):(.*)")
-          assert(x and y and dx and dy, "This is not very good!")
-          x, y, dx, dy = (tonumber(x)), (tonumber(y)), (tonumber(dx)), tonumber(dy)
-          local found = nil
-          local _list_0 = game_players
-          for _index_0 = 1, #_list_0 do
-            v = _list_0[_index_0]
-            if (tonumber(v.id)) == tonumber(id) then
-              found = v
-              break
-            end
-          end
-          if found then
-            found.x = x
-            found.y = y
-            found.dx = dx
-            found.dy = dy
-          else
-            make_player(x, y, 14, 10, (tonumber(id)), dx, dy)
-          end
-        end
-      else
-        if not (m == "timeout") then
-          error("Networking error: " .. tostring(m))
-        else
-          break
-        end
-      end
-    end
-  end
   local _list_0 = game_players
   for _index_0 = 1, #_list_0 do
     local v = _list_0[_index_0]
@@ -133,6 +113,50 @@ love.update = function(dt)
     local v = _list_1[_index_0]
     if v.update then
       v:update(dt)
+    end
+  end
+  update_time = update_time + dt
+  if update_time > update_rate and udp_player_ref then
+    local _dy
+    if not (udp_player_ref.grounded) then
+      _dy = udp_player_ref.dy
+    end
+    udp:send("move_" .. tostring(udp_player_ref.id) .. "_" .. tostring(udp_player_ref.x) .. ":" .. tostring(udp_player_ref.y) .. ":" .. tostring(udp_player_ref.dx) .. ":" .. tostring(_dy or 0))
+    udp:send("update__")
+    update_time = update_time - update_rate
+    while true do
+      local data, m = udp:receive()
+      if data then
+        local id, v = data:match("^(%d*)_(.*)")
+        if not ((tonumber(id)) == tonumber(udp_player_ref.id)) then
+          local x, y, dx, dy = v:match("^(.*):(.*):(.*):(.*)")
+          assert(x and y and dx and dy, "This is not very good!")
+          x, y, dx, dy = (tonumber(x)), (tonumber(y)), (tonumber(dx)), tonumber(dy)
+          local found = nil
+          local _list_2 = game_players
+          for _index_0 = 1, #_list_2 do
+            v = _list_2[_index_0]
+            if (tonumber(v.id)) == tonumber(id) then
+              found = v
+              break
+            end
+          end
+          if found then
+            found.x = x
+            found.y = y
+            found.dx = dx
+            found.dy = dy
+          else
+            make_friend(x, y, 14, 10, (tonumber(id)), dx, dy)
+          end
+        end
+      else
+        if not (m == "timeout") then
+          error("Networking error: " .. tostring(m))
+        else
+          break
+        end
+      end
     end
   end
   light_world:update(dt)
@@ -181,13 +205,15 @@ load_map = function(image_data)
     for y = 1, image_data:getHeight() do
       local r, g, b, a = image_data:getPixel(x - 1, y - 1)
       if r + g + b == 0 then
-        make_box(x * 16, y * 16, 16, 16)
+        make_box(x * 16, y * 16, 16, 16, "assets/sheets/grass.png")
       elseif r + g + b == 815 then
         make_pane(x * 16, y * 16, 16, 16)
+      elseif r == 100 and g == 100 and b == 100 then
+        make_box(x * 16, y * 16, 16, 16, "assets/sheets/dirt.png")
       elseif r == 255 and g == 0 and b == 0 then
         make_player(x * 16, y * 16, 10, 14.65)
       elseif r == 255 and g == 255 and b == 0 then
-        a = light_world:newLight(x * 16, y * 16, 255, 255, 255, 450)
+        a = light_world:newLight(x * 16, y * 16, 255, 255, 255, 1750)
         a:setSmooth(-1)
       end
     end

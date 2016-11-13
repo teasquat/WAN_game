@@ -2,7 +2,6 @@ local Box
 do
   local _class_0
   local _base_0 = {
-    update = function(self, dt) end,
     move = function(self, dx, dy)
       return world:move(self, self.x + dx, self.y + dy)
     end,
@@ -10,15 +9,18 @@ do
       return world:update(self, self.x, self.y, self.w * sx, self.h * sy)
     end,
     draw = function(self)
-      love.graphics.setColor(0, 0, 0)
-      return love.graphics.polygon("fill", self.rect:getPoints())
+      love.graphics.setColor(255, 255, 255)
+      return love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, self.w / 2, self.h / 2)
     end
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, x, y, w, h)
+    __init = function(self, x, y, w, h, path)
       self.x, self.y, self.w, self.h = x, y, w, h
-      self.rect = light_world:newRectangle(self.x, self.y, self.w, self.h)
+      self.image = love.graphics.newImage(path)
+      self.image_n = love.graphics.newImage(path)
+      self.sprite = light_world:newImage(self.image, self.x, self.y)
+      return self.sprite:setNormalMap(self.image_n)
     end,
     __base = _base_0,
     __name = "Box"

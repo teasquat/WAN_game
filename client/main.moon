@@ -10,7 +10,7 @@ love.graphics.setDefaultFilter "nearest", "nearest"
 socket        = require "socket"
 address, port = "localhost", 7788
 
-update_rate   = 0.1
+update_rate   = 0.05
 update_time   = update_rate
 
 udp           = socket.udp!
@@ -43,10 +43,10 @@ math.sign = (a) ->
 ----------------------------------
 -- Game objects
 ----------------------------------
-export make_box = (x, y, w, h) ->
+export make_box = (x, y, w, h, path) ->
   import Box from require "game_objects"
 
-  box = Box x, y, w, h
+  box = Box x, y, w, h, path
 
   world\add box, x, y, w, h
   table.insert game_objects, box
@@ -59,7 +59,7 @@ export make_player = (x, y, w, h, id=(math.random 1e5), dx, dy) ->
 
   player = Player x, y, w, h
 
-  player\add_gun 12, 0, 100
+  player\add_gun 3, 2, 100
 
   player.id = id
   player.dx = dx if dx
@@ -71,6 +71,22 @@ export make_player = (x, y, w, h, id=(math.random 1e5), dx, dy) ->
   unless udp_player_ref
     udp_player_ref = player
 
+export make_friend = (x, y, w, h, id=(math.random 1e5), dx, dy) ->
+  import Friend from require "game_objects"
+
+  player = Friend x, y, w, h
+
+  player\add_gun 12, 0, 100
+
+  player.id = id
+  player.dx = dx if dx
+  player.dy = dy if dy
+
+  --world\add player, x, y, w, h
+  table.insert game_players, player
+
+  unless udp_player_ref
+    udp_player_ref = player
 ----------------------------------
 -- Initialize things and stuff
 ----------------------------------
@@ -80,7 +96,7 @@ love.load = ->
   export camera       = gamera.new 0, 0, love.graphics.getWidth!, love.graphics.getHeight!
   export world        = bump.newWorld 64
   export light_world  = light {
-    ambient:              {100, 100, 100}
+    ambient:              {200, 200, 200}
     refractionStrength:   1000
     reflectionVisibility: 0
     shadowBlur: 2.0
@@ -105,13 +121,21 @@ love.load = ->
 love.update = (dt) ->
   love.window.setTitle "_business(#{ love.timer.getFPS! })"
 
+  for v in *game_players
+    v\update dt if v.update
+
+  for v in *game_objects
+    v\update dt if v.update
+
   ----------------------------------
   -- UDP update
   ----------------------------------
   update_time += dt
   if update_time > update_rate and udp_player_ref
 
-    udp\send "move_#{udp_player_ref.id}_#{udp_player_ref.x}:#{udp_player_ref.y}:#{udp_player_ref.dx}:#{udp_player_ref.dy}"
+    _dy = udp_player_ref.dy unless udp_player_ref.grounded
+
+    udp\send "move_#{udp_player_ref.id}_#{udp_player_ref.x}:#{udp_player_ref.y}:#{udp_player_ref.dx}:#{_dy or 0}"
     udp\send "update__"
 
     update_time -= update_rate
@@ -141,18 +165,12 @@ love.update = (dt) ->
             found.dx = dx
             found.dy = dy
           else
-            make_player x, y, 14, 10, (tonumber id), dx, dy
+            make_friend x, y, 14, 10, (tonumber id), dx, dy
 
       else unless m == "timeout"
         error "Networking error: " .. tostring m
       else
         break
-
-  for v in *game_players
-    v\update dt if v.update
-
-  for v in *game_objects
-    v\update dt if v.update
 
   light_world\update dt
   light_world\setTranslation camera.x, camera.y, camera.scale
@@ -185,11 +203,13 @@ export load_map = (image_data) ->
       r, g, b, a = image_data\getPixel x - 1, y - 1
 
       if r + g + b == 0
-        make_box x * 16, y * 16, 16, 16
+        make_box x * 16, y * 16, 16, 16, "assets/sheets/grass.png"
       elseif r + g + b == 815
         make_pane x * 16, y * 16, 16, 16
+      elseif r == 100 and g == 100 and b == 100
+        make_box x * 16, y * 16, 16, 16, "assets/sheets/dirt.png"
       elseif r == 255 and g == 0 and b == 0
         make_player x * 16, y * 16, 10, 14.65
       elseif r == 255 and g == 255 and b == 0
-        a = light_world\newLight x * 16, y * 16, 255, 255, 255, 450
+        a = light_world\newLight x * 16, y * 16, 255, 255, 255, 1750
         a\setSmooth -1

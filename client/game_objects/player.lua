@@ -30,9 +30,8 @@ do
       self.dx = self.dx - ((self.dx / self.friction) * dt)
       self.dy = self.dy - ((self.dy / self.friction_v) * dt)
       self.x, self.y, self.cols = world:move(self, self.x + self.dx, self.y + self.dy)
-      self.rect.x, self.rect.y = self.x, self.y
       self.sprite.x, self.sprite.y = self.x, self.y
-      camera.x, camera.y = -self.x + love.graphics.getWidth() / 3, -self.y + love.graphics.getHeight() / 2
+      camera.x, camera.y = -self.x + love.graphics.getWidth() / 7, -self.y + love.graphics.getHeight() / 7
       self.grounded = false
       local _list_0 = self.cols
       for _index_0 = 1, #_list_0 do
@@ -83,10 +82,10 @@ do
       self.jump_height = 8.5
       self:set_controls("a", "d", "space")
       self.image = love.graphics.newImage("assets/sheets/player/naked.png")
-      self.image_n = love.graphics.newImage("assets/sheets/player/naked_m.png")
+      self.image_n = love.graphics.newImage("assets/sheets/player/naked.png")
+      self.suit = love.graphics.newImage("assets/sheets/suit.png")
       self.sprite = light_world:newImage(self.image, self.x, self.y)
       self.sprite:setNormalMap(self.image_n)
-      self.rect = light_world:newRectangle(self.x, self.y, self.w, self.h)
       self.weapons = { }
       self.direction = -1
     end,
