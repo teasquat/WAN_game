@@ -1,9 +1,9 @@
 socket = require "socket"
-udp = socket.udp()
+udp = socket.udp!
 port = 7788
 
-udp\settimeout(0)
-udp\setsockname('*', port)
+udp\settimeout 0
+udp\setsockname '*', port
 
 data, msg_or_ip, port_or_nil
 entities = {}
@@ -32,6 +32,6 @@ while running do
       break
 
   elseif msg_or_ip ~= 'timeout' then
-    error("Unknown network error: "..tostring(msg_or_ip))
+    error "Unknown network error: " .. tostring msg_or_ip
 
-  socket.sleep(0.01)
+  socket.sleep 0.01
