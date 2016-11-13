@@ -1,0 +1,2 @@
+moon:
+	moonc . && love .
