@@ -2,16 +2,34 @@ local Gun
 do
   local _class_0
   local _base_0 = {
-    update = function(self, mother)
-      self.rect.x = mother.x + self.x
+    set_image = function(self, path)
+      self.image = love.graphics.newImage(path)
+    end,
+    update = function(self, mother, dir)
+      self.rect.x = mother.x + self.x * dir
       self.rect.y = mother.y + self.y
-      return self.rect:setRotation(mother.a)
+      local _list_0 = self.projectiles
+      for _index_0 = 1, #_list_0 do
+        local b = _list_0[_index_0]
+        b.x = b.x + self.bullet_speed
+      end
     end,
     draw = function(self)
+      local _list_0 = self.projectiles
+      for _index_0 = 1, #_list_0 do
+        local b = _list_0[_index_0]
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.polygon("fill", b.rect:getPoints())
+      end
       love.graphics.setColor(255, 0, 0)
       return love.graphics.polygon("fill", self.rect:getPoints())
     end,
-    shoot = function(self, a) end
+    shoot = function(self, a)
+      return table.insert(self.projectiles, {
+        self.x + self.w,
+        self.y + self.y
+      })
+    end
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
@@ -24,6 +42,8 @@ do
       end
       self.x, self.y, self.ammo, self.w, self.h = x, y, ammo, w, h
       self.rect = light_world:newRectangle(self.x, self.y, self.w, self.h)
+      self.bullet_speed = 40
+      self.projectiles = { }
     end,
     __base = _base_0,
     __name = "Gun"

@@ -12,6 +12,14 @@ math.cerp = function(a, b, dt)
   local f = (1 - (math.cos(dt * math.pi))) / 2
   return a * (1 - f) + b * f
 end
+math.sign = function(a)
+  if a < 0 then
+    return -1
+  elseif a > 0 then
+    return 1
+  end
+  return 0
+end
 make_box = function(x, y, w, h)
   local Box
   Box = require("game_objects").Box

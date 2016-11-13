@@ -13,6 +13,12 @@ class Player
 
     @weapons = {}
 
+    ----------------------------------
+    -- [-1, 1] : left/right
+    -- for gun aim and sprite rendering
+    ----------------------------------
+    @direction = -1
+
   add_gun: (x, y, a) =>
     import Gun from require "game_objects"
 
@@ -54,7 +60,11 @@ class Player
       if v.normal.x ~= 0
         @dx = 0
 
-    @aim love.mouse.getX!, love.mouse.getY!
+    temp_dir   = math.sign @dx
+    @direction = temp_dir unless temp_dir == 0
+
+    for w in *@weapons
+      w\update @, @direction
 
   press: (key) =>
     if key == @jump
@@ -63,20 +73,3 @@ class Player
     elseif key == "lshift"
       for w in *@weapons
         w\shoot 0
-
-  ----------------------------------
-  -- Calculate fancy offsets for gun - circle
-  -- Aim gun in direction - atan2
-  ----------------------------------
-  aim: (x, y) =>
-    a  = math.atan2 @x - x, @y - y
-
-    cx = @x + @w / 3 * math.cos a
-    cy = @y + @h / 3 * math.sin a
-
-    for w in *@weapons
-      w\update {
-        x: cx
-        y: cy
-        :a
-      }

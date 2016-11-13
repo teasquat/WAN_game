@@ -17,6 +17,13 @@ math.cerp = (a, b, dt) ->
   f = (1 - (math.cos dt * math.pi)) / 2
   a * (1 - f) + b * f
 
+math.sign = (a) ->
+  if a < 0
+    return -1
+  elseif a > 0
+    return 1
+  0
+
 ----------------------------------
 -- Game objects
 ----------------------------------

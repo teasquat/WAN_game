@@ -47,7 +47,15 @@ do
           self.dx = 0
         end
       end
-      return self:aim(love.mouse.getX(), love.mouse.getY())
+      local temp_dir = math.sign(self.dx)
+      if not (temp_dir == 0) then
+        self.direction = temp_dir
+      end
+      local _list_1 = self.weapons
+      for _index_0 = 1, #_list_1 do
+        local w = _list_1[_index_0]
+        w:update(self, self.direction)
+      end
     end,
     press = function(self, key)
       if key == self.jump then
@@ -60,20 +68,6 @@ do
           local w = _list_0[_index_0]
           w:shoot(0)
         end
-      end
-    end,
-    aim = function(self, x, y)
-      local a = math.atan2(self.x - x, self.y - y)
-      local cx = self.x + self.w / 3 * math.cos(a)
-      local cy = self.y + self.h / 3 * math.sin(a)
-      local _list_0 = self.weapons
-      for _index_0 = 1, #_list_0 do
-        local w = _list_0[_index_0]
-        w:update({
-          x = cx,
-          y = cy,
-          a = a
-        })
       end
     end
   }
@@ -90,6 +84,7 @@ do
       self:set_controls("a", "d", "space")
       self.rect = light_world:newRectangle(self.x, self.y, self.w, self.h)
       self.weapons = { }
+      self.direction = -1
     end,
     __base = _base_0,
     __name = "Player"
